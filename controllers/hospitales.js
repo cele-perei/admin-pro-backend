@@ -6,7 +6,8 @@ const Hospital = require('../models/hospital');
 const getHospitales = async(req, res = response) => {
 
     const hospitales = await Hospital.find()
-                                    .populate('usuario','nombre');
+                                    .populate('usuario','nombre img');
+                                    //.populate('usuario','img');
 
     res.json({
         ok: true,

@@ -73,7 +73,7 @@ const googleSignIn = async (req, res = response) => {
         await usuario.save();
 
         //Generar el token
-        const token = await generarJWT(usuario.id);
+        const token = await generarJWT(usuario.id);        
 
 
         res.json({
@@ -89,11 +89,6 @@ const googleSignIn = async (req, res = response) => {
             msg: 'Token de Google no es correcto'
         });
     }
-
-    res.json({
-        ok: true,
-        msg: req.body.token
-    });
 }
 
 const renewToken = async (req, res = response) => {
@@ -102,9 +97,15 @@ const renewToken = async (req, res = response) => {
 
     //Generar el token
     const token = await generarJWT( uid);
+
+    //obtener el usuario por id
+
+    const usuario = await Usuario.findById(uid);
+
     res.json({
         ok: true,
-        token
+        token,
+        usuario
     });
 
 

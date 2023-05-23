@@ -23,8 +23,7 @@
           .then( resp => resp.json() )
           .then( data => console.log('Nuestro server', data) )
           .catch( console.log )
-          //console.log("Encoded JWT ID token: " + response.credential);
-        }
+          }
         window.onload = function () {
           google.accounts.id.initialize({
             client_id: '273296174498-80cikj2oejdvtfv24mmdhl5d7bg6nadk.apps.googleusercontent.com',

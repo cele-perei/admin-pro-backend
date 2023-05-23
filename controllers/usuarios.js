@@ -54,7 +54,7 @@ const crearUsuarios = async (req, res = response) => {
         await usuario.save();
         const token = await generarJWT(usuario.password);
 
-        res.json({
+        return res.json({
             ok: true,
             usuario,
             token
@@ -79,7 +79,7 @@ const actualizarUsuario = async (req, res = response) => {
         const usuarioDB = await Usuario.findById(uid);
 
         if(!usuarioDB){
-            res.status(404).json({
+            return res.status(404).json({
                 ok: false,
                 msg: 'No existe un usuario por ese ID'
             });
@@ -90,17 +90,25 @@ const actualizarUsuario = async (req, res = response) => {
         if( usuarioDB.email !== email){
             const existeEmail = await Usuario.findOne( {email} );
             if (existeEmail){
-                res.status(404).json({
+                return res.status(404).json({
                     ok: false,
                     msg: 'Ya existe un usuario con ese email'
                 });
             }
         }
 
-        campos.email = email;
+        if(!usuarioDB.google){
+            campos.email = email;
+        } else if (usuarioDB.email !== email) {
+            return res.status(400).json({
+                ok: false,
+                msg: 'Usuarios de google no pueden cambiar su correo'
+            });
+        }
+
         const usuarioActualizado = await Usuario.findByIdAndUpdate( uid, campos, {new: true});
 
-        res.json({
+        return res.json({
             ok: true,
             usuarioActualizado
         });
@@ -122,13 +130,13 @@ const borrarUsuario = async (req, res = response) => {
         const usuarioDB = await Usuario.findById(uid);
 
         if(!usuarioDB){
-            res.status(404).json({
+            return res.status(404).json({
                 ok: false,
                 msg: 'No existe un usuario por ese ID'
             });
         }
          await Usuario.findByIdAndDelete(uid);
-        res.status(200).json({
+        return res.status(200).json({
             ok: true,
             msg: 'Usuario eliminado'
         });
