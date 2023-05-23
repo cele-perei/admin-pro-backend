@@ -4,6 +4,7 @@ const bcrypt = require('bcryptjs');
 const Usuario = require('../models/usuario');
 const { generarJWT } = require('../helpers/jwt');
 const { googleVerify } = require('../helpers/google-verify');
+const { getMenuFrontEnd } = require('../helpers/menu-frontend');
 
 const login = async (req, res = response) => {
 
@@ -34,7 +35,8 @@ const login = async (req, res = response) => {
         const token = await generarJWT(usuarioDB.id);
         res.json({
             ok: true,
-            token
+            token,
+            menu: getMenuFrontEnd(usuarioDB.role)
         });
         
         
@@ -50,8 +52,10 @@ const login = async (req, res = response) => {
 
 const googleSignIn = async (req, res = response) => {
 
+    const googleToken = req.body.token;
+
     try {
-        const {email, name, picture} = await googleVerify( req.body.token );
+        const {email, name, picture} = await googleVerify( googleToken );
 
         const usuarioDB = await Usuario.findOne( {email} );
         let usuario;
@@ -78,13 +82,12 @@ const googleSignIn = async (req, res = response) => {
 
         res.json({
             ok: true,
-            email, name, picture,
-            token
+            token,
+            menu: getMenuFrontEnd( usuario.role )
         });
         
     } catch (error) {
-        console.log(error);
-        res.status(400).json({
+        res.status(401).json({
             ok: false,
             msg: 'Token de Google no es correcto'
         });
@@ -105,7 +108,8 @@ const renewToken = async (req, res = response) => {
     res.json({
         ok: true,
         token,
-        usuario
+        usuario,
+        menu: getMenuFrontEnd( usuario.role )
     });
 
 
